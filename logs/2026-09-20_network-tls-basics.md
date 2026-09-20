@@ -60,6 +60,38 @@
 - パブリックIPv4は 1 時間 $0.005(月約 $3.65)で、EC2 に紐付けていても課金される。
 - RDS は時間課金。検証で立てて消した分は数セント。
 
+## 5.5 追加で理解したこと(その日の後半)
+
+### NACL
+- サブネット単位のファイアウォール。SG と違い**ステートレス**(戻りの通信も明示的に許可が必要)で、許可と拒否の両方を書け、番号の小さい順に評価される。
+- デフォルト NACL は全許可。通常は SG だけで足り、特定 IP の明示拒否などで使う。
+- 自分の環境の NACL がデフォルトのままかは未確認。
+
+### メインルートテーブル
+- 関連付けのないサブネットには、VPC のメインルートテーブルが自動で使われる。メインには IGW を足さないのが安全。
+
+### 踏み台・SSM・EICE
+- private の EC2 に入る方法: 踏み台 EC2、SSM Session Manager(22番不要・鍵不要・ログが残る)、EC2 Instance Connect Endpoint。
+- SSM = Systems Manager の略。Session Manager はその一機能で、Parameter Store も同じ SSM の一部。
+- 今回は EC2 が public で自宅IP限定の SSH のため、どれも使っていない(実際に試してはいない)。
+- コンソール(ブラウザ)と AWS CLI(ターミナルで `aws ...`)の違いを整理した。自分の構築はすべてコンソールで行った。
+
+### ALB
+- ALB は2つ以上の AZ の public サブネットに置き、EC2 は private に置ける(EC2 にパブリックIP不要)。今回の構成には ALB はない。
+
+### Secrets Manager と Parameter Store
+- Parameter Store は標準なら無料でローテーションなし、Secrets Manager は $0.40/月で自動ローテーションあり。
+- 現状、アプリはまだシークレットを参照していない(RDS 検証で使っただけ)。
+
+### nginx と certbot
+- `nginx -t` は設定の文法テスト。reload 前に実行する。ポートの間違いなど文法以外は検出できない。
+- certbot は Let's Encrypt から証明書を取得・更新するツール。DNS-01 では、プラグイン(certbot-dns-route53、boto3 で Route 53 API を呼ぶ)が `_acme-challenge` の TXT レコードを書き、Let's Encrypt がそれを見てドメインの管理者と判断する。書き込み権限は EC2 の IAM ロール。
+- `certbot renew --dry-run` は成功を確認したが、本番の自動更新が走った実績はまだない。
+
+## 5.6 試験(SAP)の計画
+
+- SAP を 2026-10-13 に受験予定。方針は、先に模試で弱点分野を見つけ、その分野に絞ってハンズオン(VPC エンドポイント、Organizations と SCP など)を行う。
+
 ## 6. 次にやること
 
 - [ ] Elastic IP を自分で取り直す(解放するのは `dashboard-eip` のみ。bot 側の `GMO_trade_IP` は触らない)。その後 Route 53 の A レコードを更新。
