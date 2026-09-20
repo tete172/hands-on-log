@@ -15,6 +15,7 @@
 
 | 日付 | 分野 | テーマ | 内容 |
 |---|---|---|---|
+| 2026-09-20 | AWS / Linux / Web | [ネットワーク・Web スタック・TLS の基礎](logs/2026-09-20_network-tls-basics.md) | ルートテーブル/IGW/SG、nginx・uvicorn・FastAPI の役割、TLS の鍵交換と本人確認、Let's Encrypt DNS-01 |
 | 2026-09-19 | AWS | [VPC / EC2 / RDS / Secrets Manager](logs/2026-09-19_vpc-ec2-rds-secrets.md) | 新規 VPC(パブリック/プライベート×2AZ)、SG、IAM ロール(最小権限)、Secrets Manager、EC2、RDS(検証のみ・削除済み) |
 
 分野ごとの予定:
