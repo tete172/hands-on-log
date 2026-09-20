@@ -22,7 +22,7 @@ EC2 (t3.micro, public subnet) ──IAM ロール──▶ Secrets Manager(DB �
 
 ### 1. ドメイン取得
 - Route 53 で独自ドメインを取得($16/年、`.com`)。ホストゾーンは登録と同時に自動作成される
-- 取得できるドメインが `.com` で $16 だったのは `list-prices` で事前確認した
+- `.com` は登録も更新も $16/年。料金を確認してから購入した
 
 ### 2. VPC
 - `10.1.0.0/16` を新規作成。既存のボット用 VPC(`172.31.0.0/16`)・学習用 VPC(`10.0.0.0/24`)と CIDR が重ならないようにした
@@ -117,7 +117,7 @@ psql -h <RDS エンドポイント> -U dashboard_admin -d fxbot_dashboard
 ```
 EC2(public)→ RDS(private)の接続と、Secrets Manager に入れた認証情報が RDS の実際の認証情報と一致していることを確認できた。
 
-**削除**: 確認後すぐ削除(最終スナップショットなし)。`describe-db-instances` が `DBInstanceNotFound`、スナップショット 0 件で課金対象が残っていないことを確認。
+**削除**: 接続確認後すぐにコンソールから削除した(最終スナップショットは作成しない)。一覧から消え、スナップショットも残っていないので課金対象は無い。CLI でも `aws rds describe-db-instances` が `DBInstanceNotFound` を返すことで確認できる(次回は自分で打って確認する)。
 
 > RDS の用語: 「DB インスタンス」= RDS のデータベースサーバ 1 台のこと。削除しても EC2 / VPC / SG / IAM / シークレットには影響しない。
 
